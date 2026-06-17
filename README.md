@@ -12,7 +12,6 @@ A clean, fully functional shopping cart application with real-time total calcula
 - Auto-calculated subtotal, discount, shipping, and final total
 - Free shipping threshold nudge (orders over ₹999)
 - Wishlist to save favourite products
-- Order history with auto-progressing status (Processing → Shipped → Delivered)
 
 ---
 
