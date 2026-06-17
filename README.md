@@ -6,12 +6,13 @@ A clean, fully functional shopping cart application with real-time total calcula
 
 ## Features
 
-- Browse 8 products across multiple categories
+- Browse 28 products across multiple categories
 - Add items to cart, adjust quantity, or remove them
 - Apply discount codes (percent-off or flat-off)
 - Auto-calculated subtotal, discount, shipping, and final total
-- Free shipping threshold nudge (orders over ₹500)
-- Fully responsive — works on mobile, tablet, and desktop
+- Free shipping threshold nudge (orders over ₹999)
+- Wishlist to save favourite products
+- Order history with auto-progressing status (Processing → Shipped → Delivered)
 
 ---
 
@@ -21,8 +22,8 @@ A clean, fully functional shopping cart application with real-time total calcula
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/your-username/shopcart.git
-cd shopcart
+git clone https://github.com/LIKITHgh/ShopCart.git
+cd ShopCart
 
 # 2. Install dependencies
 npm install
@@ -49,7 +50,7 @@ npm run preview    # preview the production build locally
 | Framework | React 18 | Component model fits cart state well |
 | Build tool | Vite 5 | Fast HMR, zero-config for React |
 | Styling | Plain CSS (custom properties) | No extra dependencies, full control |
-| State | React `useState` + `useMemo` | Lightweight; no need for Redux at this scale |
+| State | React `useState` + `useMemo` + Context API | Lightweight; no need for Redux at this scale |
 | Language | JSX / JavaScript | Keeps the stack minimal for a focused demo |
 
 ---
@@ -63,44 +64,50 @@ npm run preview    # preview the production build locally
 | `FLAT100` | ₹100 flat discount |
 | `FLAT500` | ₹500 flat discount |
 | `HALFOFF` | 50% off subtotal |
+| `WELCOME` | 15% off subtotal |
 
 ---
 
 ## Assumptions Made
 
 1. **Currency**: Prices are stored internally in paise (smallest unit) to avoid floating-point rounding errors, then displayed as ₹ (INR) — appropriate for an Indian market context.
-2. **Shipping**: Fixed ₹99 shipping fee; free for orders over ₹500 subtotal (before discounts).
+2. **Shipping**: Fixed ₹99 shipping fee; free for orders over ₹999 subtotal (before discounts).
 3. **One discount at a time**: Only one code can be applied per order. Applying a new code replaces the old one.
 4. **Flat discount cap**: Flat discounts are capped at the subtotal — they cannot produce a negative total.
 5. **No backend / persistence**: Cart state is in-memory only; a refresh clears the cart. A real implementation would use a backend or localStorage.
-6. **Checkout is a stub**: The "Proceed to Checkout" button is present for UX completeness but does not navigate anywhere.
 
 ---
 
 ## Project Structure
 
 ```
-shopcart/
+ShopCart/
 ├── index.html
 ├── package.json
 ├── vite.config.js
 ├── README.md
 └── src/
-    ├── main.jsx       # React entry point
-    ├── App.jsx        # All application logic and UI
-    └── index.css      # All styles
+    ├── main.jsx                  # React entry point
+    ├── App.jsx                   # Root component and page router
+    ├── index.css                 # Global styles
+    ├── context/
+    │   └── CartContext.jsx       # Global state — cart, wishlist, orders, discounts
+    ├── data/
+    │   └── products.js           # Product catalogue and discount code definitions
+    ├── components/
+    │   ├── Navbar.jsx            # Sticky navigation with cart badge
+    │   └── Notification.jsx      # Toast notification component
+    └── pages/
+        ├── HomePage.jsx          # Shop page with search, filters, and product grid
+        ├── CartPage.jsx          # Dedicated cart and order summary page
+        ├── WishlistPage.jsx      # Saved / wishlisted products
+        └── OrdersPage.jsx        # Order history with expandable details
 ```
-
-The entire application is intentionally kept in a single component (`App.jsx`) for clarity and ease of review. In a production codebase this would be split into `ProductCard`, `CartItem`, `OrderSummary`, `DiscountInput`, etc.
 
 ---
 
 ## AI Development Note
 
-This project was built with **Claude (Anthropic)** as the primary AI-assisted development tool. Claude was used to generate the full initial implementation — component structure, state logic, discount calculation, CSS layout, and responsive design — from a plain-English description of requirements. The AI proved particularly effective at:
+During development, I used **Claude (Anthropic)** and **GitHub Copilot** as AI-assisted tools to speed up parts of the workflow. Copilot was helpful for boilerplate and repetitive code — things like mapping over product arrays, writing repetitive JSX structure, and quick CSS property completions. Claude was useful when I needed to think through a specific implementation, such as how to structure the cart context or handle the order status progression logic.
 
-- Translating business rules (e.g., "flat discount should never produce a negative total") directly into correct validation logic
-- Suggesting storing prices in paise to eliminate floating-point issues — a subtle but important correctness decision
-- Producing well-organized CSS with a consistent custom-property token system on the first pass
-
-The main challenge was ensuring that the generated code reflected real-world edge cases (empty cart validation, removing items while a discount is applied, the free shipping threshold) rather than only the happy path. These edge cases required iterative prompting and review. The overall experience demonstrated that AI tools dramatically compress the time from spec to working UI, while human judgment remains essential for validating correctness and completeness.
+That said, the overall design decisions, component architecture, feature choices, and the iterative refinements throughout the project were driven by me. AI tools helped me move faster on the implementation side, but the problem-solving, debugging, and making sure everything fit together correctly was hands-on work. The experience reinforced that these tools are genuinely useful as a productivity aid, but they work best when you already have a clear idea of what you're building and why.
